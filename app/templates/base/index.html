@@ -169,12 +169,9 @@
                             <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
                         </div>
                         <div class="navbar-nav ml-auto py-0">
-                            <a href="" class="nav-item nav-link">Login</a>
-                            <a href="" class="nav-item nav-link">Register</a>
-                            <form method='POST' action="{% url 'logout' %}">
-                                {% csrf_token %}
-                                <button type="submit">logout</button>
-                            <form>
+                            <a href="{% url 'login' %}" class="nav-item nav-link">Login</a>
+                            <a href="{% url 'register' %}" class="nav-item nav-link">Register</a>
+                            <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
                         </div>
                     </div>
                 </nav>
