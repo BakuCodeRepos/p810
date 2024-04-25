@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'product',
     'order',
+    'modeltranslation',
 ]
 
 MIDDLEWARE = [
@@ -115,10 +116,18 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
+LANGUAGES = (
+    ('en', 'en'),
+    ('az', 'az'),
+    ('ru', 'ru'),
+)
 
-LANGUAGE_CODE = 'en-us'
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+MODELTRANSLATION_LANGUAGES = ('en', 'az', 'ru')
 
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = 'az'
+
+TIME_ZONE = 'Asia/Baku'
 
 USE_I18N = True
 

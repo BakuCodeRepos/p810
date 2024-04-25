@@ -4,9 +4,12 @@ from utils.models import BaseModel
 
 class Category(BaseModel):
     name = models.CharField(max_length=255)
-    child = models.ManyToManyField(
+    parent = models.ForeignKey(
         'self',
-        blank=True
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='childs',
     )
     slug = models.SlugField(
         unique=True,
@@ -18,6 +21,7 @@ class Category(BaseModel):
         null=True,
         blank=True
     )
+    is_parent = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.name

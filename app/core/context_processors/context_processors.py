@@ -1,9 +1,11 @@
 from contact.models import ContactInfo
+from product.models import Category
 
 
 def subject_renderer(request):
     context = {
-        'contact_info': ContactInfo.objects.first()
+        'contact_info': ContactInfo.objects.first(),
+        'categories': Category.objects.filter(parent__isnull=True)
     }
 
     # if request.user.is_authenticated:
