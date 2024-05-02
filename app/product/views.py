@@ -1,3 +1,4 @@
+from typing import Any
 from django.shortcuts import render
 from django.views.generic import ListView, DeleteView, DetailView, UpdateView
 from .models import Product
@@ -21,3 +22,10 @@ class ProductDetailView(DetailView):
     context_object_name = 'product'
     template_name = 'product/detail.html'
     slug_url_kwarg = 'slug'
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        sizes = [size for size in self.get_object().size]
+        context['sizes'] = sizes
+
+        return context

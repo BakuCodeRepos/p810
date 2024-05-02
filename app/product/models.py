@@ -23,6 +23,11 @@ class Category(BaseModel):
     )
     is_parent = models.BooleanField(default=False)
 
+    @property
+    def product_count(self):
+        subcategories = self.childs.all()
+        return sum([cat.products.count() for cat in subcategories])
+
     def __str__(self) -> str:
         return self.name
     
@@ -111,10 +116,12 @@ class Product(BaseModel):
         related_name='products',
         null=True
     )
-    product_type = models.ForeignKey(
-        ProductType,
-        on_delete=models.PROTECT,
-        related_name='products'
+    color = models.CharField(max_length=20, null=True)
+    size = models.JSONField(null=True)
+    siblings = models.ManyToManyField(
+        'self',
+        null=True,
+        blank=True
     )
     image = models.ImageField(
         upload_to='products',
