@@ -1,3 +1,13 @@
 from django.shortcuts import render
+from .models import OrderItem
 
-# Create your views here.
+
+def basket(request):
+    items = OrderItem.objects.filter(
+        user=request.user,
+        status=0
+    )
+    context = {
+        'items': items
+    }
+    return render(request, 'order/basket.html', context)

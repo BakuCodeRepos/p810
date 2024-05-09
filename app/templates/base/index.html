@@ -80,11 +80,11 @@
             <div class="col-lg-3 col-6 text-right">
                 <a href="" class="btn border">
                     <i class="fas fa-heart text-primary"></i>
-                    <span class="badge">0</span>
+                    <span class="badge">{{ wish_list_count }}</span>
                 </a>
-                <a href="" class="btn border">
+                <a href="{% url 'basket' %}" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
-                    <span class="badge">0</span>
+                    <span class="badge">{{ basket_order_count }}</span>
                 </a>
             </div>
         </div>
@@ -295,6 +295,9 @@
 
     <!-- Template Javascript -->
     <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        let csrftoken_ = '{{ csrf_token }}'
+    </script>
     {% block js %}
     {% endblock %}
 </body>

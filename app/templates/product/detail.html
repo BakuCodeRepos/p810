@@ -39,7 +39,7 @@
                         {% for size in sizes %}
                             {% for key, value in size.items %}
                                 <div class="custom-control custom-radio custom-control-inline">
-                                    <input type="radio" {% if value == 0 %}disabled{% endif %} class="custom-control-input" id="{{ key }}" name="size">
+                                    <input type="radio" {% if value == 0 %}disabled{% endif %} class="custom-control-input" id="{{ key }}" value="{{ key }}" name="size">
                                     <label class="custom-control-label" for="{{ key }}">{{ key }}</label>
                                 </div>
                             {% endfor %}
@@ -50,12 +50,12 @@
                     <p class="text-dark font-weight-medium mb-0 mr-3">Colors:</p>
                     <form>
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" selected class="custom-control-input" id="{{ product.color }}" name="color">
+                                <input type="radio" checked class="custom-control-input" id="{{ product.color }}" name="color" value="{{ product.color }}">
                                 <label class="custom-control-label" onclick="goToThis('{{ product.slug }}')" for="{{ product.color }}">{{ product.color }}</label>
                             </div>
                         {% for sibling in product.siblings.all %}
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" class="custom-control-input" id="{{ sibling.color }}" name="color">
+                                <input type="radio" class="custom-control-input" id="{{ sibling.color }}" name="color" value="{{ sibling.color }}">
                                 <label class="custom-control-label" onclick="goToThis('{{ sibling.slug }}')" for="{{ sibling.color }}">{{ sibling.color }}</label>
                             </div>
                         {% endfor %}
@@ -68,14 +68,14 @@
                             <i class="fa fa-minus"></i>
                             </button>
                         </div>
-                        <input type="text" class="form-control bg-secondary text-center" value="1">
+                        <input type="text" class="form-control bg-secondary text-center" id="product-qty" value="1">
                         <div class="input-group-btn">
                             <button class="btn btn-primary btn-plus">
                                 <i class="fa fa-plus"></i>
                             </button>
                         </div>
                     </div>
-                    <button class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
+                    <button onclick="createOrderItem()" class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
                 </div>
             </div>
         </div>
@@ -236,8 +236,11 @@
 
 {% block js %}
     <script>
+        let productId = '{{ product.id }}'
+        let createOrderItemUrl = "{% url 'order_item_create' %}"
         function goToThis(slug) {
             window.location.href = slug
         }
     </script>
+    <script src="{% static 'js/order.js' %}"></script>
 {% endblock %}
