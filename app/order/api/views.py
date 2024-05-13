@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 
 from ..models import OrderItem
-from .serializers import OrderItemSerializer
+from .serializers import OrderItemSerializer, OrderItemDeleteSerializer
 
 
 class OrderItemCreateAPIView(generics.CreateAPIView):
@@ -32,3 +32,8 @@ class OrderItemCreateAPIView(generics.CreateAPIView):
             instance.product.save()
         data = serializer.data
         return Response(data={"detail": "OK", 'data': data}, status=201)
+
+
+class OrderItemDeleteApiView(generics.DestroyAPIView):
+    queryset = OrderItem.objects.all()
+    serializer_class = OrderItemDeleteSerializer

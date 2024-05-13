@@ -8,3 +8,9 @@ class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ['product', 'size', 'color', 'quantity']
+
+
+class OrderItemDeleteSerializer(serializers.ModelSerializer):    
+    class Meta:
+        model = OrderItem
+        fields = ['id']
