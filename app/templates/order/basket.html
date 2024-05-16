@@ -33,7 +33,7 @@
                     </thead>
                     <tbody class="align-middle">
                         {% for item in items %}
-                            <tr id='tr-{{ item.id }}'>
+                            <tr name="order-items" id='tr-{{ item.id }}' data-id="{{ item.id }}">
                                 <td class="align-middle"><img src="{{ item.product.image.url }}" alt="product" style="width: 50px; margin-right: 10px;">{{ item.product.name }}</td>
                                 <td class="align-middle"><span id="price-{{ item.id }}">{{ item.product.price }}</span> AZN</td>
                                 <td class="align-middle">
@@ -86,7 +86,7 @@
                             <h5 class="font-weight-bold">Total</h5>
                             <h5 class="font-weight-bold"><span id="total"></span> AZN</h5>
                         </div>
-                        <button class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</button>
+                        <button onclick="createOrder()" class="btn btn-block btn-primary my-3 py-3">Proceed To Checkout</button>
                     </div>
                 </div>
             </div>
@@ -97,5 +97,9 @@
 {% endblock %}
 
 {% block js %}
+    <script>
+        let deleteOrderItemUrl = "{% url 'order_item_delete' 1 %}"
+        let createOrderUrl = "{% url 'order_create' %}"
+    </script>
     <script src="{% static 'js/basket.js' %}"></script>
 {% endblock %}

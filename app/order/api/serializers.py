@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ..models import OrderItem
+from ..models import OrderItem, Order
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -14,3 +14,9 @@ class OrderItemDeleteSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ['id']
+
+
+class OrderCreateSerializer(serializers.ModelSerializer):    
+    class Meta:
+        model = Order
+        fields = ['subtotal', 'total', 'shipping']

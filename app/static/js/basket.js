@@ -12,10 +12,9 @@ function changePrice(itemId, minusButton, plusOrMinus) {
     } else if (parseInt(quantity) > 1 && plusOrMinus === 'plus') {
         $(`#minusButton-${itemId}`).removeAttr('disabled');
     }
-    subtotal.innerHTML = parseFloat((parseFloat(price) * parseFloat(quantity)).toFixed(2));
+    subtotal.innerHTML = Number(price.replace(',', '.')) * Number(quantity);
     calcTotal();
 }
-
 
 function calcTotal() {
     let subtotalValues = document.getElementsByName('subtotal');
@@ -23,17 +22,61 @@ function calcTotal() {
     let total = document.getElementById('total');
     let shipping = document.getElementById('shipping');
     let subtotal_result = 0;
-    for (subtotalValue of subtotalValues) {
-        subtotal_result += parseFloat(subtotalValue.innerHTML)
+    for (let subtotalValue of subtotalValues) {
+        subtotal_result += Number(subtotalValue.innerHTML.replace(',', '.'))
     }
-    console.log('subtotal_result', subtotal_result)
-    subtotalFinal.innerHTML = subtotal_result
-    shipping.innerHTML = subtotal_result * 5 / 100
-    total.innerHTML = subtotal_result + (subtotal_result * 5 / 100)
+    subtotalFinal.innerHTML = Number(subtotal_result).toFixed(2)
+    shipping.innerHTML = Number(subtotal_result * 5 / 100).toFixed(2)
+    total.innerHTML = Number(subtotal_result + (subtotal_result * 5 / 100)).toFixed(2)
 }
 
 function deleteItem(itemId) {
-    document.getElementById(`tr-${itemId}`).remove()
+    document.getElementById(`tr-${itemId}`).remove();
+    calcTotal();
+    deleteOrderItem(itemId);
 }
+
+function deleteOrderItem(itemId) {
+    $.ajax({
+      method: "DELETE",
+      url: deleteOrderItemUrl.replace('1', itemId),
+      headers: { "X-CSRFToken": csrftoken_ },
+      error: function(data) {
+        console.log('error cixdiiiii', data);
+      }
+    });
+}
+
+
+function getItems() {
+    data = [];
+    let items = document.getElementsByName('order-items'); // tr elements
+    for (let item of items) {
+      data.push(item.getAttribute('data-id'))
+    }
+    return JSON.stringify(data)
+} 
+
+function createOrder() {
+    $.ajax({
+      method: "POST",
+      url: createOrderUrl,
+      headers: { "X-CSRFToken": csrftoken_ },
+      data: {
+        subtotal: document.getElementById("subtotal-final").innerHTML.replace(',', '.'),
+        total: document.getElementById("total").innerHTML.replace(',', '.'),
+        shipping: document.getElementById('shipping').innerHTML.replace(',', '.'),
+        items: getItems()
+      },
+      dataType: "json",
+      success: function () {
+        window.location.reload();
+      },
+      error: function(data) {
+        console.log('error cixdiiiii', data);
+      }
+    });
+  }
+
 
 window.addEventListener("load", calcTotal);

@@ -1,8 +1,9 @@
+import json
 from rest_framework import generics
 from rest_framework.response import Response
 
-from ..models import OrderItem
-from .serializers import OrderItemSerializer, OrderItemDeleteSerializer
+from ..models import Order, OrderItem
+from .serializers import OrderCreateSerializer, OrderItemSerializer, OrderItemDeleteSerializer
 
 
 class OrderItemCreateAPIView(generics.CreateAPIView):
@@ -37,3 +38,25 @@ class OrderItemCreateAPIView(generics.CreateAPIView):
 class OrderItemDeleteApiView(generics.DestroyAPIView):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemDeleteSerializer
+
+
+class OrderCreateAPIView(generics.CreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderCreateSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        order = serializer.save()
+        order.user = request.user
+        order.save()
+
+        Order.objects.filter(user=request.user, is_done=False).exclude(id=order.id).delete()
+        item_ids = json.loads(request.data.get('items', '[]'))
+        for item_id in item_ids:
+            order_item = OrderItem.objects.get(id=item_id)
+            order_item.order = order
+            order_item.save()
+
+        data = serializer.data
+        return Response(data={"detail": "OK", 'data': data}, status=201)
