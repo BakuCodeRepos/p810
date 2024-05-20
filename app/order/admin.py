@@ -10,7 +10,7 @@ class OrderItemAdmin(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'get_user_full_name', 'get_user_email', 'shipping', 'total', 'created_at')
+    list_display = ('id', 'get_user_full_name', 'get_user_email', 'shipping', 'total', 'is_done', 'created_at')
     inlines = [OrderItemAdmin]
 
     def get_user_full_name(self, obj):

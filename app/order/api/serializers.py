@@ -20,3 +20,9 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = ['subtotal', 'total', 'shipping']
+
+
+class OrderIsDoneSerializer(serializers.ModelSerializer):    
+    class Meta:
+        model = Order
+        fields = ['is_done']

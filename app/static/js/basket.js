@@ -52,7 +52,9 @@ function getItems() {
     data = [];
     let items = document.getElementsByName('order-items'); // tr elements
     for (let item of items) {
-      data.push(item.getAttribute('data-id'))
+      let itemId = item.getAttribute('data-id')
+      let quantity = document.getElementById(`quantity-${itemId}`).value
+      data.push({"id": itemId, "quantity": quantity})
     }
     return JSON.stringify(data)
 } 
@@ -70,7 +72,7 @@ function createOrder() {
       },
       dataType: "json",
       success: function () {
-        window.location.reload();
+        window.location = "/checkout";
       },
       error: function(data) {
         console.log('error cixdiiiii', data);
