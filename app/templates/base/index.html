@@ -295,8 +295,11 @@
 
     <!-- Template Javascript -->
     <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/wishList.js' %}"></script>
     <script>
         let csrftoken_ = '{{ csrf_token }}'
+        let add_to_wish_list_url = "{% url 'add_to_wish_list' %}"
+        let remove_to_wish_list_url = "{% url 'remove_to_wish_list' %}"
     </script>
     {% block js %}
     {% endblock %}

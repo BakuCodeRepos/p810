@@ -2,8 +2,15 @@ import json
 from rest_framework import generics
 from rest_framework.response import Response
 
-from ..models import Order, OrderItem
-from .serializers import OrderCreateSerializer, OrderIsDoneSerializer, OrderItemSerializer, OrderItemDeleteSerializer
+from product.models import Product
+
+from ..models import Order, OrderItem, WishList
+from .serializers import (OrderCreateSerializer,
+                          OrderIsDoneSerializer,
+                          OrderItemSerializer,
+                          OrderItemDeleteSerializer,
+                          AddProductToWishListSerializer
+                        )
 
 
 class OrderItemCreateAPIView(generics.CreateAPIView):
@@ -74,4 +81,30 @@ class OrderIsDoneAPIView(generics.UpdateAPIView):
         for item in order.items.all():
             item.status = 1
             item.save()
+        return Response(data={"detail": "OK"}, status=200)
+
+
+class AddProductToWishListAPIView(generics.CreateAPIView):
+    queryset = WishList.objects.all()
+    serializer_class = AddProductToWishListSerializer
+
+    def post(self, request, *args, **kwargs):
+        wish_list, _ = WishList.objects.get_or_create(user=request.user)
+        product_id = json.loads(request.data.get('product', '[]'))
+        print('product_id', product_id)
+        product = Product.objects.get(id=product_id[0])
+        wish_list.product.add(product)
+        return Response(data={"detail": "OK"}, status=200)
+
+
+class RemoveProductToWishListAPIView(generics.CreateAPIView):
+    queryset = WishList.objects.all()
+    serializer_class = AddProductToWishListSerializer
+
+    def post(self, request, *args, **kwargs):
+        wish_list, _ = WishList.objects.get_or_create(user=request.user)
+        product_id = json.loads(request.data.get('product', '[]'))
+        print('product_id', product_id)
+        product = Product.objects.get(id=product_id[0])
+        wish_list.product.remove(product)
         return Response(data={"detail": "OK"}, status=200)

@@ -1,4 +1,5 @@
 from django.db import models
+from order.models import WishList
 from utils.models import BaseModel
 
 
@@ -143,6 +144,18 @@ class Product(BaseModel):
     adding_to_basket_count = models.PositiveIntegerField(
         default=0
     )
+    added_to_wish_list = models.BooleanField(default=False)
+
+    # @property
+    # def added_to_wish_list(self):
+    #     try:
+    #         wish_list = WishList.objects.get(user=self.request.user)
+    #         product = Product.objects.get(id=self.id)
+    #         if product in wish_list.product.all():
+    #             return True
+    #         return False
+    #     except WishList.DoesNotExist:
+    #         return False
 
     def __str__(self) -> str:
         return self.name

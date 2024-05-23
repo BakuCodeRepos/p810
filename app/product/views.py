@@ -1,6 +1,9 @@
 from typing import Any
+from django.db.models.query import QuerySet
 from django.shortcuts import render
 from django.views.generic import ListView, DeleteView, DetailView, UpdateView
+
+from order.models import WishList
 from .models import Product
 
 
@@ -16,6 +19,24 @@ class ProductListView(ListView): # class based product list view
     context_object_name = 'products' # default name = object_list
     template_name = 'product/list.html'
 
+    def get_queryset(self):
+        q = super().get_queryset()
+        main_result = []
+        for product in q:
+            try:
+                wish_list = WishList.objects.get(user=self.request.user)
+                if product in wish_list.product.all():
+                    result = True
+                result = False
+            except WishList.DoesNotExist:
+                result = False
+            if result:
+                product.added_to_wish_list = True
+            else:
+                product.added_to_wish_list = False
+            product.save()
+            main_result.append(product)
+        return main_result
 
 class ProductDetailView(DetailView):
     queryset = Product.objects.all()
