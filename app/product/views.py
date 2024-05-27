@@ -1,11 +1,12 @@
 from typing import Any
-from django.db.models.query import QuerySet
+
+from django.db.models import Q
 from django.shortcuts import render
-from django.views.generic import ListView, DeleteView, DetailView, UpdateView
-
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView, ListView
 from order.models import WishList
-from .models import Product
 
+from .models import Product
 
 # def products(request): # function based product list view
 #     products = Product.objects.all()
@@ -14,29 +15,73 @@ from .models import Product
 #     }
 #     return render(request, 'product/list.html', context)
 
-class ProductListView(ListView): # class based product list view
-    queryset = Product.objects.all()
-    context_object_name = 'products' # default name = object_list
-    template_name = 'product/list.html'
+class ProductListView(ListView):
+    template_name = "product/list.html"
+    model = Product
+    context_object_name = "products"
+    paginate_by = 9
 
     def get_queryset(self):
-        q = super().get_queryset()
-        main_result = []
-        for product in q:
-            try:
-                wish_list = WishList.objects.get(user=self.request.user)
-                if product in wish_list.product.all():
-                    result = True
-                result = False
-            except WishList.DoesNotExist:
-                result = False
-            if result:
+        qs = super().get_queryset()
+        if 'filter' in self.request.GET:
+            our_filter = self.request.GET['filter']
+            if our_filter == 'latest':
+                qs = qs.order_by('-created_at')
+            elif our_filter == 'trandy':
+                qs = qs.order_by('-adding_to_basket_count')
+            elif our_filter == 'increased_price':
+                qs = qs.order_by('price')
+            elif our_filter == 'decreased_price':
+                qs = qs.order_by('-price')
+        if 'start_price' in self.request.GET and 'end_price' in self.request.GET:
+            start_price = self.request.GET.get('start_price')
+            end_price = self.request.GET.get('end_price')
+
+            start_price = int(start_price) if start_price else 0
+            end_price = int(end_price) if end_price else 10000
+            qs = qs.filter(price__range=[start_price, end_price])
+        return is_in_wish_list(qs, self.request.user)
+    
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        if 'start_price' in self.request.GET and 'end_price' in self.request.GET:
+            start_price = self.request.GET.get('start_price')
+            end_price = self.request.GET.get('end_price')
+            
+            start_price = int(start_price) if start_price else 0
+            end_price = int(end_price) if end_price else 10000
+            context['start_price'] = start_price
+            context['end_price'] = end_price
+        if 'filter' in self.request.GET:
+            our_filter = self.request.GET['filter']
+            if our_filter == 'latest':
+                context['our_filter'] = _('Latest')
+            elif our_filter == 'trandy':
+                context['our_filter'] = _('Popularity')
+            elif our_filter == 'increased_price':
+                context['our_filter'] = _('Increased price')
+            elif our_filter == 'decreased_price':
+                context['our_filter'] = _('Decreased price')
+        else:
+            context['our_filter'] = _('Sort by')
+        return context
+
+
+def is_in_wish_list(products, user):
+    result = []
+    for product in products:
+        try:
+            wish_list = WishList.objects.get(user=user)
+            if product in wish_list.product.all():
                 product.added_to_wish_list = True
             else:
                 product.added_to_wish_list = False
-            product.save()
-            main_result.append(product)
-        return main_result
+        except WishList.DoesNotExist:
+            product.added_to_wish_list = False
+        product.save()
+        result.append(product)
+    return result
+    
 
 class ProductDetailView(DetailView):
     queryset = Product.objects.all()
@@ -50,3 +95,16 @@ class ProductDetailView(DetailView):
         context['sizes'] = sizes
 
         return context
+
+
+def search(request):
+    search_input = request.GET.get('search_input')
+    result = []
+    if search_input:
+        result = Product.objects.filter(Q(name__icontains=search_input) | Q(description__icontains=search_input))
+    context = {
+        'results': result,
+        'result_count': len(result),
+        'keyword': search_input
+    }
+    return render(request, 'search.html', context)
