@@ -40,7 +40,9 @@ class ProductListView(ListView):
             start_price = int(start_price) if start_price else 0
             end_price = int(end_price) if end_price else 10000
             qs = qs.filter(price__range=[start_price, end_price])
-        return is_in_wish_list(qs, self.request.user)
+            # if self.request.user.is_authenticated:
+            qs = is_in_wish_list(qs, self.request.user)
+        return qs
     
     def get_context_data(self, **kwargs: Any):
         context = super().get_context_data(**kwargs)
@@ -74,10 +76,13 @@ def is_in_wish_list(products, user):
             wish_list = WishList.objects.get(user=user)
             if product in wish_list.product.all():
                 product.added_to_wish_list = True
+                print('state 1', product.added_to_wish_list)
             else:
                 product.added_to_wish_list = False
+                print('state 2', product.added_to_wish_list)
         except WishList.DoesNotExist:
             product.added_to_wish_list = False
+            print('state 3', product.added_to_wish_list)
         product.save()
         result.append(product)
     return result

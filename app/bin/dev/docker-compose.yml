@@ -10,10 +10,36 @@ services:
       - app_postgres-data:/var/lib/postgresql/data
     env_file: .env
 
+  redis:
+    container_name: redis
+    image: redis:5
+    restart: "on-failure"
+    env_file: .env
+    expose:
+      - '6379'
+    ports:
+      - '6379:6379'
+    volumes:
+      - app_redis-data2:/data
+
+  celery: &celery
+    container_name: celery
+    build: .
+    env_file: .env
+    volumes:
+      - ../..:/code
+    command: bash -c "cd /code/ && celery --app=app.celery:app worker -B --loglevel=INFO"
+    depends_on:
+      - web
+      - redis
+    links:
+      - postgres
+      - redis
+
   web:
     container_name: app
     build: .
-    restart: "on-failure"
+    restart: "always"
     env_file: ./.env
     volumes:
       - ../../:/code
@@ -24,4 +50,5 @@ services:
     command: bash -c " python /code/manage.py makemigrations --noinput && python /code/manage.py migrate && python /code/manage.py runserver 0.0.0.0:8000"
 
 volumes:
+  app_redis-data2:
   app_postgres-data:

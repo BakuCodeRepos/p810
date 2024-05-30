@@ -44,6 +44,34 @@ services:
       - ./pgdb:/var/lib/postgresql/data
     env_file: .env
 
+  redis:
+    build:
+      context: .
+      dockerfile: redis.dockerfile
+    image: redis:4.0.11
+    restart: "on-failure"
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redisdb:/var/lib/redis
+    env_file: .env
+
+  celery:
+    restart: "always"
+    build: .
+    container_name: celery
+    env_file: .env
+    command: celery --app=app.celery:app worker -B --loglevel=INFO
+    volumes:
+      - ../..:/code
+    links:
+      - redis
+      - postgres
+    depends_on:
+      - "redis"
+      - "postgres"
+
 networks:
   default:
     external:

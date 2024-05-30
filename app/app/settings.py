@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     'order',
     'modeltranslation',
     'rest_framework',
+    'celery',
+    'django_celery_results',
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = [
@@ -155,3 +158,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/login'
+
+CELERY_BROKER_URL='redis://redis:6379/0'
