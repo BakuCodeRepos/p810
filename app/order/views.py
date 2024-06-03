@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from product.views import is_in_wish_list
 
+from order.tasks import send_sms_when_status_changed
+
 from .models import Order, OrderItem, WishList
 
 
@@ -20,7 +22,7 @@ def checkout(request):
         user=request.user,
         is_done=False
     )
-    # send_sms_when_status_changed.delay()
+    send_sms_when_status_changed.delay()
     context = {
         'order': order
     }
