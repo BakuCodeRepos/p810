@@ -47,6 +47,9 @@ services:
       - "8000:8000"
     depends_on:
       - "postgres"
+    links:
+      - postgres
+      - redis
     command: bash -c " python /code/manage.py makemigrations --noinput && python /code/manage.py migrate && python /code/manage.py runserver 0.0.0.0:8000"
 
 volumes:

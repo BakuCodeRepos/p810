@@ -6,7 +6,7 @@ ENV APP_ROOT /code
 
 WORKDIR ${APP_ROOT}
 
-COPY ./requirements.txt requirements.txt
+COPY requirements.txt requirements.txt
 
 RUN apt-get update && \
   apt-get install -y \
@@ -21,9 +21,9 @@ RUN apt-get update && \
   && pip install --no-cache-dir -r requirements.txt \
   && apt-get clean --dry-run
 
-COPY ./mime.types /etc/mime.types
-COPY ./uwsgi.ini /conf/uwsgi.ini
-COPY ../.. /code
+COPY mime.types /etc/mime.types
+COPY uwsgi.ini /conf/uwsgi.ini
+COPY app/ /code
 
 # Start uWSGI
 CMD [ "uwsgi", "--ini", "/conf/uwsgi.ini"]
